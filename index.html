@@ -1,1 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Contemporary World - Final Examination</title>
+  <style>
+    /* Prevent text highlight and callouts on mobile touchscreen */
+    * {
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      box-sizing: border-box;
+    }
 
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 12px;
+      color: #1c1e21;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .header-box {
+      text-align: center;
+      border-bottom: 2px solid #edf2f7;
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      font-size: 20px;
+      color: #1a365d;
+      margin: 0 0 4px 0;
+    }
+
+    p.subtitle {
+      color: #718096;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #2d3748;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      background-color: #f8fafc;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    input[type="text"]:focus {
+      border-color: #3182ce;
+      background-color: #fff;
+    }
+
+    .question-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .question-title {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #2d3748;
+      margin-bottom: 12px;
+    }
+
+    /* Touch-friendly radio button card style */
+    .option-label {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #4a5568;
+      transition: all 0.15s ease;
+    }
+
+    .option-label:active {
+      background-color: #ebf8ff;
+    }
+
+    .option-label input[type="radio"] {
+      margin-right: 12px;
+      width: 18px;
+      height: 18px;
+      accent-color: #3182ce;
+    }
+
+    button.btn-primary {
+      width: 100%;
+      background: #2b6cb0;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button.btn-primary:active {
+      background: #2c5282;
+    }
+
+    button:disabled {
+      background: #a0aec0;
+    }
+
+    /* Result Modal (Score Only) */
+    #score-modal {
+      display: none;
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    .score-badge {
+      font-size: 38px;
+      font-weight: 800;
+      color: #2b6cb0;
+      margin: 12px 0 4px 0;
+    }
+
+    .percentage-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 12px;
+    }
+
+    .no-answers-note {
+      font-size: 12px;
+      color: #a0aec0;
+      margin-top: 15px;
+      font-style: italic;
+    }
+
+    /* Anti-cheat overlay */
+    .blurred {
+      filter: blur(16px);
+      pointer-events: none;
+    }
+
+    .warning-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.92);
+      color: white;
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 24px;
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<div id="warning-screen" class="warning-overlay">
+  <div>⚠️ Exam paused.<br>Switching applications or leaving the screen is disabled during examination.</div>
+</div>
+
+<div class="container" id="app-container">
+  <div class="header-box">
+    <h2>Contemporary World</h2>
+    <p class="subtitle">Final Examination (2 Points Each)</p>
+  </div>
+
+  <!-- Step 1: Student Information -->
+  <div id="student-info-step">
+    <div class="form-group">
+      <label for="student-name">Full Name *</label>
+      <input type="text" id="student-name" required placeholder="Last Name, First Name">
+    </div>
+    <div class="form-group">
+      <label for="course-block">Course & Block *</label>
+      <input type="text" id="course-block" required placeholder="e.g. BSIT 2-A">
+    </div>
+    <button type="button" class="btn-primary" onclick="startExam()">Start Exam</button>
+  </div>
+
+  <!-- Step 2: Shuffled Exam Questions -->
+  <div id="exam-step" style="display: none;">
+    <form id="quiz-form">
+      <div id="questions-list"></div>
+      <button type="submit" id="submit-btn" class="btn-primary">Submit Exam</button>
+    </form>
+  </div>
+
+  <!-- Step 3: Score Result Screen (Score Only, No Detailed Key) -->
+  <div id="score-modal">
+    <h3 style="color: #2d3748; margin-top: 0;">Exam Submitted!</h3>
+    <p style="color: #718096; font-size: 14px;">Your response has been saved.</p>
+    <div class="score-badge" id="final-score">-- / --</div>
+    <div class="percentage-text" id="final-percentage">--%</div>
+    <p class="no-answers-note">Answer key details are hidden for security reasons.</p>
+  </div>
+</div>
+
+<script>
+  // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxoVcbUqEs1cLjN09jVU8N3Zk-ejQHzoYytx7xlg3YK4t_GmqPLaAtLhZTSIw5Mky4/exec";
+
+  let loadedQuestions = [];
+  let userDetails = {};
+
+  // ANTI-CHEAT: Prevent Context Menu / Long Press Callouts
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  // ANTI-CHEAT: Disable Copy / Cut Shortcuts
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey) {
+      if (['c', 'C', 'u', 'U', 's', 'S', 'p', 'P', 'a', 'A'].includes(e.key)) {
+        e.preventDefault();
+      }
+    }
+  });
+
+  // ANTI-CHEAT: Blur UI if App / Tab is switched
+  window.addEventListener('blur', () => {
+    if (document.getElementById('exam-step').style.display === 'block') {
+      document.getElementById('app-container').classList.add('blurred');
+      document.getElementById('warning-screen').style.display = 'flex';
+    }
+  });
+
+  window.addEventListener('focus', () => {
+    document.getElementById('app-container').classList.remove('blurred');
+    document.getElementById('warning-screen').style.display = 'none';
+  });
+
+  async function startExam() {
+    const name = document.getElementById('student-name').value.trim();
+    const courseBlock = document.getElementById('course-block').value.trim();
+
+    if (!name || !courseBlock) {
+      alert("Please enter both your Full Name and Course/Block.");
+      return;
+    }
+
+    userDetails = { name, courseBlock };
+
+    try {
+      const resp = await fetch(`${SCRIPT_URL}?name=${encodeURIComponent(name)}&courseBlock=${encodeURIComponent(courseBlock)}`);
+      const data = await resp.json();
+
+      if (data.status === "already_responded") {
+        alert(data.message);
+        return;
+      }
+
+      loadedQuestions = data.questions;
+      renderQuestions(loadedQuestions);
+
+      document.getElementById('student-info-step').style.display = 'none';
+      document.getElementById('exam-step').style.display = 'block';
+
+    } catch (err) {
+      alert("Error initializing exam. Please verify your Web App URL and internet connection.");
+      console.error(err);
+    }
+  }
+
+  function renderQuestions(questions) {
+    const container = document.getElementById('questions-list');
+    container.innerHTML = '';
+
+    questions.forEach((q, index) => {
+      const card = document.createElement('div');
+      card.className = 'question-card';
+
+      let optionsHTML = q.options.map(opt => `
+        <label class="option-label">
+          <input type="radio" name="q_${q.id}" value="${escapeHtml(opt)}" required>
+          <span>${escapeHtml(opt)}</span>
+        </label>
+      `).join('');
+
+      card.innerHTML = `
+        <div class="question-title">${index + 1}. ${escapeHtml(q.text)}</div>
+        ${optionsHTML}
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, function(m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+    });
+  }
+
+  document.getElementById('quiz-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('submit-btn').innerText = "Submitting...";
+
+    const formData = new FormData(this);
+    const answers = {};
+
+    loadedQuestions.forEach(q => {
+      answers[q.id] = formData.get(`q_${q.id}`);
+    });
+
+    const payload = {
+      ...userDetails,
+      answers: answers
+    };
+
+    try {
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload)
+      });
+
+      const resData = await response.json();
+
+      if (resData.status === "success") {
+        document.getElementById('exam-step').style.display = 'none';
+        document.getElementById('score-modal').style.display = 'block';
+        document.getElementById('final-score').innerText = `${resData.score} / ${resData.totalPoints}`;
+        document.getElementById('final-percentage').innerText = `Grade: ${resData.percentage}%`;
+      } else {
+        alert(resData.message);
+        document.getElementById('submit-btn').disabled = false;
+        document.getElementById('submit-btn').innerText = "Submit Exam";
+      }
+
+    } catch (err) {
+      alert("An error occurred during submission. Please try again.");
+      document.getElementById('submit-btn').disabled = false;
+      document.getElementById('submit-btn').innerText = "Submit Exam";
+    }
+  });
+</script>
+
+</body>
+</html>
