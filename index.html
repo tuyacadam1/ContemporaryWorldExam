@@ -230,7 +230,7 @@
     <p class="subtitle">Final Examination (2 Points Each)</p>
   </div>
 
-  <!-- Step 1: Student Information -->
+  <!-- Step 1: Student Details -->
   <div id="student-info-step">
     <div class="form-group">
       <label for="student-name">Full Name *</label>
@@ -269,10 +269,11 @@
 
 <script>
   // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxoVcbUqEs1cLjN09jVU8N3Zk-ejQHzoYytx7xlg3YK4t_GmqPLaAtLhZTSIw5Mky4/exec";
+  const SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
 
   let loadedQuestions = [];
   let userDetails = {};
+  let userAnswers = {}; // Holds selected answers permanently across sections
   let currentSection = 0;
   const totalSections = 6;
   const questionsPerSection = 5;
@@ -320,6 +321,7 @@
       }
 
       loadedQuestions = data.questions;
+      userAnswers = {}; // Reset answers store
       currentSection = 0;
       renderCurrentSection();
 
@@ -347,12 +349,15 @@
       const card = document.createElement('div');
       card.className = 'question-card';
 
-      let optionsHTML = q.options.map(opt => `
-        <label class="option-label">
-          <input type="radio" name="q_${q.id}" value="${escapeHtml(opt)}">
-          <span>${escapeHtml(opt)}</span>
-        </label>
-      `).join('');
+      let optionsHTML = q.options.map(opt => {
+        const isChecked = userAnswers[q.id] === opt ? 'checked' : '';
+        return `
+          <label class="option-label">
+            <input type="radio" name="q_${q.id}" value="${escapeHtml(opt)}" ${isChecked} onchange="saveAnswer(${q.id}, this.value)">
+            <span>${escapeHtml(opt)}</span>
+          </label>
+        `;
+      }).join('');
 
       card.innerHTML = `
         <div class="question-title">${globalQuestionNum}. ${escapeHtml(q.text)}</div>
@@ -361,7 +366,6 @@
       container.appendChild(card);
     });
 
-    // Navigation state updates
     document.getElementById('prev-btn').disabled = (currentSection === 0);
 
     if (currentSection === totalSections - 1) {
@@ -373,6 +377,11 @@
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Saves answer choice directly to global memory object
+  function saveAnswer(questionId, selectedValue) {
+    userAnswers[questionId] = selectedValue;
   }
 
   function changeSection(direction) {
@@ -392,22 +401,17 @@
   document.getElementById('quiz-form').addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    // Check if any question was left unanswered
-    const formData = new FormData(this);
-    const answers = {};
-    let unansweredCount = 0;
+    // Check if any of the 30 questions were left unanswered
+    let unansweredQuestions = [];
 
-    loadedQuestions.forEach(q => {
-      const val = formData.get(`q_${q.id}`);
-      if (!val) {
-        unansweredCount++;
-      } else {
-        answers[q.id] = val;
+    loadedQuestions.forEach((q, index) => {
+      if (!userAnswers[q.id]) {
+        unansweredQuestions.push(index + 1);
       }
     });
 
-    if (unansweredCount > 0) {
-      alert(`You have ${unansweredCount} unanswered question(s). Please review all sections before submitting.`);
+    if (unansweredQuestions.length > 0) {
+      alert(`You have unanswered question(s): #${unansweredQuestions.join(', #')}. Please go back and select answers for all questions before submitting.`);
       return;
     }
 
@@ -416,7 +420,7 @@
 
     const payload = {
       ...userDetails,
-      answers: answers
+      answers: userAnswers
     };
 
     try {
