@@ -5,6 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Contemporary World - Final Examination</title>
   <style>
+    :root {
+      --bg-color: #f0f2f5;
+      --card-bg: #ffffff;
+      --text-color: #1c1e21;
+      --subtext-color: #718096;
+      --border-color: #e2e8f0;
+      --input-bg: #f8fafc;
+      --option-bg: #f8fafc;
+      --option-hover: #ebf8ff;
+      --primary-color: #2b6cb0;
+      --primary-hover: #2c5282;
+      --header-text: #1a365d;
+      --sec-header-bg: #ebf8ff;
+      --sec-header-text: #2b6cb0;
+      --timer-bg: #edf2f7;
+      --timer-text: #2d3748;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-color: #f8fafc;
+      --subtext-color: #94a3b8;
+      --border-color: #334155;
+      --input-bg: #0f172a;
+      --option-bg: #0f172a;
+      --option-hover: #1e3a8a;
+      --primary-color: #3b82f6;
+      --primary-hover: #2563eb;
+      --header-text: #60a5fa;
+      --sec-header-bg: #1e3a8a;
+      --sec-header-text: #93c5fd;
+      --timer-bg: #334155;
+      --timer-text: #f8fafc;
+    }
+
     * {
       -webkit-user-select: none;
       -khtml-user-select: none;
@@ -17,37 +53,83 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f0f2f5;
+      background-color: var(--bg-color);
       margin: 0;
       padding: 12px;
-      color: #1c1e21;
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .container {
       max-width: 600px;
       margin: 0 auto;
-      background: #ffffff;
+      background: var(--card-bg);
       padding: 20px 16px;
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       position: relative;
+    }
+
+    /* Top Utility Bar (Dark Mode & Timer) */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .theme-toggle {
+      background: var(--timer-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .timer-badge {
+      background: var(--timer-bg);
+      color: var(--timer-text);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .timer-warning {
+      color: #ef4444 !important;
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { opacity: 1; }
+      to { opacity: 0.5; }
     }
 
     .header-box {
       text-align: center;
-      border-bottom: 2px solid #edf2f7;
+      border-bottom: 2px solid var(--border-color);
       padding-bottom: 12px;
       margin-bottom: 18px;
     }
 
     h2 {
       font-size: 20px;
-      color: #1a365d;
+      color: var(--header-text);
       margin: 0 0 4px 0;
     }
 
     p.subtitle {
-      color: #718096;
+      color: var(--subtext-color);
       font-size: 13px;
       margin: 0;
     }
@@ -61,51 +143,50 @@
       font-weight: 600;
       margin-bottom: 6px;
       font-size: 13px;
-      color: #2d3748;
+      color: var(--text-color);
     }
 
     input[type="text"] {
       width: 100%;
       padding: 12px;
-      border: 1px solid #cbd5e0;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 15px;
       outline: none;
-      background-color: #f8fafc;
+      background-color: var(--input-bg);
+      color: var(--text-color);
       -webkit-user-select: text;
       user-select: text;
     }
 
     input[type="text"]:focus {
-      border-color: #3182ce;
-      background-color: #fff;
+      border-color: var(--primary-color);
     }
 
     .section-header {
       font-weight: 700;
-      color: #2b6cb0;
+      color: var(--sec-header-text);
       font-size: 15px;
       margin-bottom: 12px;
       text-align: center;
-      background-color: #ebf8ff;
+      background-color: var(--sec-header-bg);
       padding: 8px;
       border-radius: 6px;
     }
 
     .question-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
       border-radius: 10px;
       padding: 14px;
       margin-bottom: 14px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
 
     .question-title {
       font-weight: 600;
       font-size: 14px;
       line-height: 1.4;
-      color: #2d3748;
+      color: var(--text-color);
       margin-bottom: 12px;
     }
 
@@ -113,25 +194,25 @@
       display: flex;
       align-items: center;
       padding: 12px;
-      background: #f8fafc;
-      border: 1.5px solid #e2e8f0;
+      background: var(--option-bg);
+      border: 1.5px solid var(--border-color);
       border-radius: 8px;
       margin-bottom: 8px;
       cursor: pointer;
       font-size: 14px;
-      color: #4a5568;
+      color: var(--text-color);
       transition: all 0.15s ease;
     }
 
     .option-label:active {
-      background-color: #ebf8ff;
+      background-color: var(--option-hover);
     }
 
     .option-label input[type="radio"] {
       margin-right: 12px;
       width: 18px;
       height: 18px;
-      accent-color: #3182ce;
+      accent-color: var(--primary-color);
     }
 
     .nav-buttons {
@@ -142,7 +223,7 @@
 
     button.btn-primary {
       flex: 1;
-      background: #2b6cb0;
+      background: var(--primary-color);
       color: white;
       border: none;
       padding: 14px;
@@ -158,8 +239,8 @@
 
     button.btn-secondary {
       flex: 1;
-      background: #e2e8f0;
-      color: #4a5568;
+      background: var(--border-color);
+      color: var(--text-color);
       border: none;
       padding: 14px;
       border-radius: 8px;
@@ -169,12 +250,10 @@
     }
 
     button:disabled {
-      background: #cbd5e0 !important;
-      color: #718096 !important;
+      opacity: 0.6;
       cursor: not-allowed;
     }
 
-    /* Loading Spinner UI */
     .spinner {
       width: 18px;
       height: 18px;
@@ -191,9 +270,9 @@
 
     .loading-banner {
       display: none;
-      background-color: #ebf8ff;
-      border: 1px solid #bee3f8;
-      color: #2b6cb0;
+      background-color: var(--sec-header-bg);
+      border: 1px solid var(--border-color);
+      color: var(--sec-header-text);
       padding: 10px;
       border-radius: 8px;
       font-size: 13px;
@@ -211,20 +290,20 @@
     .score-badge {
       font-size: 38px;
       font-weight: 800;
-      color: #2b6cb0;
+      color: var(--primary-color);
       margin: 12px 0 4px 0;
     }
 
     .percentage-text {
       font-size: 18px;
       font-weight: 600;
-      color: #4a5568;
+      color: var(--subtext-color);
       margin-bottom: 12px;
     }
 
     .no-answers-note {
       font-size: 12px;
-      color: #a0aec0;
+      color: var(--subtext-color);
       margin-top: 15px;
       font-style: italic;
     }
@@ -258,9 +337,20 @@
 </div>
 
 <div class="container" id="app-container">
+  
+  <!-- Utility Bar: Dark Mode Switch & Timer -->
+  <div class="top-bar">
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <span id="theme-icon">🌙</span> <span id="theme-text">Dark</span>
+    </button>
+    <div id="exam-timer" class="timer-badge">
+      ⏱️ <span id="timer-display">60:00</span>
+    </div>
+  </div>
+
   <div class="header-box">
     <h2>Contemporary World</h2>
-    <p class="subtitle">Final Examination (2 Points Each)</p>
+    <p class="subtitle">Final Examination (2 Points Each • 1 Hour Limit)</p>
   </div>
 
   <!-- Step 1: Student Details -->
@@ -307,8 +397,8 @@
 
   <!-- Step 3: Result Screen -->
   <div id="score-modal">
-    <h3 style="color: #2d3748; margin-top: 0;">Exam Submitted!</h3>
-    <p style="color: #718096; font-size: 14px;">Your response has been recorded successfully.</p>
+    <h3 style="color: var(--text-color); margin-top: 0;">Exam Submitted!</h3>
+    <p style="color: var(--subtext-color); font-size: 14px;" id="submission-reason-msg">Your response has been recorded successfully.</p>
     <div class="score-badge" id="final-score">-- / --</div>
     <div class="percentage-text" id="final-percentage">--%</div>
     <p class="no-answers-note">Answer key details are hidden for test security.</p>
@@ -317,7 +407,7 @@
 
 <script>
   // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxoVcbUqEs1cLjN09jVU8N3Zk-ejQHzoYytx7xlg3YK4t_GmqPLaAtLhZTSIw5Mky4/exec";
+  const SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
 
   let loadedQuestions = [];
   let userDetails = {};
@@ -326,7 +416,26 @@
   const totalSections = 6;
   const questionsPerSection = 5;
 
-  // Anti-cheat protections
+  // Timer Variables (3600 seconds = 60 minutes)
+  let timeRemaining = 3600;
+  let timerInterval = null;
+  let isSubmitted = false;
+
+  // DARK MODE TOGGLE
+  function toggleTheme() {
+    const currentTheme = document.body.getAttribute('data-theme');
+    if (currentTheme === 'dark') {
+      document.body.removeAttribute('data-theme');
+      document.getElementById('theme-icon').innerText = '🌙';
+      document.getElementById('theme-text').innerText = 'Dark';
+    } else {
+      document.body.setAttribute('data-theme', 'dark');
+      document.getElementById('theme-icon').innerText = '☀️';
+      document.getElementById('theme-text').innerText = 'Light';
+    }
+  }
+
+  // ANTI-CHEAT PROTECTIONS
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', e => {
     if (e.ctrlKey || e.metaKey) {
@@ -337,7 +446,7 @@
   });
 
   window.addEventListener('blur', () => {
-    if (document.getElementById('exam-step').style.display === 'block') {
+    if (document.getElementById('exam-step').style.display === 'block' && !isSubmitted) {
       document.getElementById('app-container').classList.add('blurred');
       document.getElementById('warning-screen').style.display = 'flex';
     }
@@ -359,7 +468,6 @@
 
     userDetails = { name, courseBlock };
 
-    // SHOW LOADING INDICATOR & DISABLE BUTTON
     const startBtn = document.getElementById('start-btn');
     const startSpinner = document.getElementById('start-spinner');
     const startText = document.getElementById('start-text');
@@ -387,12 +495,42 @@
 
       document.getElementById('student-info-step').style.display = 'none';
       document.getElementById('exam-step').style.display = 'block';
+      
+      // Start 1-hour timer
+      document.getElementById('exam-timer').style.display = 'flex';
+      startTimer();
 
     } catch (err) {
       alert("Error starting exam. Please check your internet connection and try again.");
       console.error(err);
       resetStartButton();
     }
+  }
+
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      timeRemaining--;
+
+      const minutes = Math.floor(timeRemaining / 60);
+      const seconds = timeRemaining % 60;
+      const formattedMin = minutes < 10 ? `0${minutes}` : minutes;
+      const formattedSec = seconds < 10 ? `0${seconds}` : seconds;
+
+      const timerDisplay = document.getElementById('timer-display');
+      timerDisplay.innerText = `${formattedMin}:${formattedSec}`;
+
+      // Warning when 5 minutes remaining
+      if (timeRemaining <= 300) {
+        document.getElementById('exam-timer').classList.add('timer-warning');
+      }
+
+      // Force submit when time expires
+      if (timeRemaining <= 0) {
+        clearInterval(timerInterval);
+        alert("⏰ Time is up! Your exam is being automatically submitted.");
+        executeSubmission(true);
+      }
+    }, 1000);
   }
 
   function resetStartButton() {
@@ -465,7 +603,7 @@
     });
   }
 
-  document.getElementById('quiz-form').addEventListener('submit', async function(e) {
+  document.getElementById('quiz-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
     let unansweredQuestions = [];
@@ -476,11 +614,19 @@
     });
 
     if (unansweredQuestions.length > 0) {
-      alert(`You have unanswered question(s): #${unansweredQuestions.join(', #')}. Please go back and select answers for all questions before submitting.`);
+      alert(`You have unanswered question(s): #${unansweredQuestions.join(', #')}. Please complete all questions before submitting.`);
       return;
     }
 
-    // SHOW SUBMIT SPINNER
+    executeSubmission(false);
+  });
+
+  async function executeSubmission(isAutoSubmit) {
+    if (isSubmitted) return;
+    isSubmitted = true;
+
+    if (timerInterval) clearInterval(timerInterval);
+
     const submitBtn = document.getElementById('submit-btn');
     const submitSpinner = document.getElementById('submit-spinner');
     const submitText = document.getElementById('submit-text');
@@ -507,19 +653,27 @@
 
       if (resData.status === "success") {
         document.getElementById('exam-step').style.display = 'none';
+        document.getElementById('exam-timer').style.display = 'none';
         document.getElementById('score-modal').style.display = 'block';
+
+        if (isAutoSubmit) {
+          document.getElementById('submission-reason-msg').innerText = "Time expired! Your completed answers have been submitted.";
+        }
+
         document.getElementById('final-score').innerText = `${resData.score} / ${resData.totalPoints}`;
         document.getElementById('final-percentage').innerText = `Grade: ${resData.percentage}%`;
       } else {
         alert(resData.message);
+        isSubmitted = false;
         resetSubmitButton();
       }
 
     } catch (err) {
-      alert("An error occurred during submission. Please try again.");
+      alert("An error occurred during submission. Retrying...");
+      isSubmitted = false;
       resetSubmitButton();
     }
-  });
+  }
 
   function resetSubmitButton() {
     document.getElementById('submit-btn').disabled = false;
