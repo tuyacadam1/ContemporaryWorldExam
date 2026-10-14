@@ -15,12 +15,12 @@
       --option-bg: #f8fafc;
       --option-hover: #ebf8ff;
       --primary-color: #2b6cb0;
-      --primary-hover: #2c5282;
       --header-text: #1a365d;
       --sec-header-bg: #ebf8ff;
       --sec-header-text: #2b6cb0;
       --timer-bg: #edf2f7;
       --timer-text: #2d3748;
+      --watermark-color: rgba(220, 38, 38, 0.12);
     }
 
     [data-theme="dark"] {
@@ -33,12 +33,12 @@
       --option-bg: #0f172a;
       --option-hover: #1e3a8a;
       --primary-color: #3b82f6;
-      --primary-hover: #2563eb;
       --header-text: #60a5fa;
       --sec-header-bg: #1e3a8a;
       --sec-header-text: #93c5fd;
       --timer-bg: #334155;
       --timer-text: #f8fafc;
+      --watermark-color: rgba(239, 68, 68, 0.18);
     }
 
     * {
@@ -70,7 +70,6 @@
       position: relative;
     }
 
-    /* Top Utility Bar (Dark Mode & Timer) */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -99,7 +98,6 @@
       border-radius: 20px;
       font-size: 14px;
       font-weight: bold;
-      letter-spacing: 0.5px;
       display: none;
       align-items: center;
       gap: 6px;
@@ -180,9 +178,29 @@
       border-radius: 10px;
       padding: 14px;
       margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .watermark-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(-18deg);
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--watermark-color);
+      white-space: nowrap;
+      user-select: none;
+      z-index: 1;
     }
 
     .question-title {
+      position: relative;
+      z-index: 2;
       font-weight: 600;
       font-size: 14px;
       line-height: 1.4;
@@ -191,6 +209,8 @@
     }
 
     .option-label {
+      position: relative;
+      z-index: 2;
       display: flex;
       align-items: center;
       padding: 12px;
@@ -317,7 +337,7 @@
       display: none;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.92);
+      background: rgba(15, 23, 42, 0.95);
       color: white;
       z-index: 9999;
       justify-content: center;
@@ -333,12 +353,11 @@
 <body>
 
 <div id="warning-screen" class="warning-overlay">
-  <div>⚠️ Exam paused.<br>Navigating away from the exam screen is disabled during examination.</div>
+  <div>⚠️ Exam paused.<br>Switching screens or taking screenshots blurs examination content.</div>
 </div>
 
 <div class="container" id="app-container">
   
-  <!-- Utility Bar: Dark Mode Switch & Timer -->
   <div class="top-bar">
     <button class="theme-toggle" onclick="toggleTheme()">
       <span id="theme-icon">🌙</span> <span id="theme-text">Dark</span>
@@ -370,7 +389,7 @@
     </button>
 
     <div id="loading-notice" class="loading-banner">
-      ⏳ Loading questions from server... Please wait a moment.
+      ⏳ Fetching exam paper... Please wait a moment.
     </div>
   </div>
 
@@ -390,7 +409,7 @@
       </div>
 
       <div id="submitting-notice" class="loading-banner">
-        ⏳ Submitting your responses and computing score... Please stay on this page.
+        ⏳ Submitting responses and calculating score... Please stay on this page.
       </div>
     </form>
   </div>
@@ -401,13 +420,13 @@
     <p style="color: var(--subtext-color); font-size: 14px;" id="submission-reason-msg">Your response has been recorded successfully.</p>
     <div class="score-badge" id="final-score">-- / --</div>
     <div class="percentage-text" id="final-percentage">--%</div>
-    <p class="no-answers-note">Answer key details are hidden for test security.</p>
+    <p class="no-answers-note">Answer key details are hidden for security reasons.</p>
   </div>
 </div>
 
 <script>
   // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
-  const SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxoVcbUqEs1cLjN09jVU8N3Zk-ejQHzoYytx7xlg3YK4t_GmqPLaAtLhZTSIw5Mky4/exec";
 
   let loadedQuestions = [];
   let userDetails = {};
@@ -416,12 +435,10 @@
   const totalSections = 6;
   const questionsPerSection = 5;
 
-  // Timer Variables (3600 seconds = 60 minutes)
-  let timeRemaining = 3600;
+  let timeRemaining = 3600; // 1 Hour limit
   let timerInterval = null;
   let isSubmitted = false;
 
-  // DARK MODE TOGGLE
   function toggleTheme() {
     const currentTheme = document.body.getAttribute('data-theme');
     if (currentTheme === 'dark') {
@@ -435,7 +452,7 @@
     }
   }
 
-  // ANTI-CHEAT PROTECTIONS
+  // Anti-cheat & Blur triggers
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', e => {
     if (e.ctrlKey || e.metaKey) {
@@ -445,16 +462,23 @@
     }
   });
 
-  window.addEventListener('blur', () => {
+  function triggerBlur() {
     if (document.getElementById('exam-step').style.display === 'block' && !isSubmitted) {
       document.getElementById('app-container').classList.add('blurred');
       document.getElementById('warning-screen').style.display = 'flex';
     }
-  });
+  }
 
-  window.addEventListener('focus', () => {
+  function clearBlur() {
     document.getElementById('app-container').classList.remove('blurred');
     document.getElementById('warning-screen').style.display = 'none';
+  }
+
+  window.addEventListener('blur', triggerBlur);
+  window.addEventListener('focus', clearBlur);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) triggerBlur();
+    else clearBlur();
   });
 
   async function startExam() {
@@ -496,12 +520,11 @@
       document.getElementById('student-info-step').style.display = 'none';
       document.getElementById('exam-step').style.display = 'block';
       
-      // Start 1-hour timer
       document.getElementById('exam-timer').style.display = 'flex';
       startTimer();
 
     } catch (err) {
-      alert("Error starting exam. Please check your internet connection and try again.");
+      alert("Error starting exam. Please check your internet connection.");
       console.error(err);
       resetStartButton();
     }
@@ -516,18 +539,15 @@
       const formattedMin = minutes < 10 ? `0${minutes}` : minutes;
       const formattedSec = seconds < 10 ? `0${seconds}` : seconds;
 
-      const timerDisplay = document.getElementById('timer-display');
-      timerDisplay.innerText = `${formattedMin}:${formattedSec}`;
+      document.getElementById('timer-display').innerText = `${formattedMin}:${formattedSec}`;
 
-      // Warning when 5 minutes remaining
       if (timeRemaining <= 300) {
         document.getElementById('exam-timer').classList.add('timer-warning');
       }
 
-      // Force submit when time expires
       if (timeRemaining <= 0) {
         clearInterval(timerInterval);
-        alert("⏰ Time is up! Your exam is being automatically submitted.");
+        alert("⏰ Time is up! Your answers are being automatically submitted.");
         executeSubmission(true);
       }
     }, 1000);
@@ -550,6 +570,8 @@
     const endIndex = startIndex + questionsPerSection;
     const sectionQuestions = loadedQuestions.slice(startIndex, endIndex);
 
+    const watermarkText = `${userDetails.name} • ${userDetails.courseBlock}`;
+
     sectionQuestions.forEach((q, idx) => {
       const globalQuestionNum = startIndex + idx + 1;
       const card = document.createElement('div');
@@ -566,6 +588,7 @@
       }).join('');
 
       card.innerHTML = `
+        <div class="watermark-overlay">${escapeHtml(watermarkText)}</div>
         <div class="question-title">${globalQuestionNum}. ${escapeHtml(q.text)}</div>
         ${optionsHTML}
       `;
@@ -657,7 +680,7 @@
         document.getElementById('score-modal').style.display = 'block';
 
         if (isAutoSubmit) {
-          document.getElementById('submission-reason-msg').innerText = "Time expired! Your completed answers have been submitted.";
+          document.getElementById('submission-reason-msg').innerText = "Time expired! Your completed answers have been submitted automatically.";
         }
 
         document.getElementById('final-score').innerText = `${resData.score} / ${resData.totalPoints}`;
